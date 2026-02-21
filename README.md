@@ -1,5 +1,7 @@
 # TIL 지식 관리 MCP 서버
 
+> **GitHub**: https://github.com/kangraemin/mcp-learning
+
 개발 학습 내용(TIL: Today I Learned)을 기록하고, 검색하고, 요약해주는 서버.
 Claude에게 "오늘 배운 거 기록해줘"라고 말하면 알아서 저장해준다.
 
