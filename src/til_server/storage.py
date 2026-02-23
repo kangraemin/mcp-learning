@@ -15,14 +15,20 @@ SQLite 대신 로컬 마크다운 파일로 TIL을 저장/조회한다.
     ---
     내용
 """
+import os
 import re
 from datetime import datetime, date, timedelta
 from pathlib import Path
 
 import frontmatter
 
-# 데이터 디렉토리: 프로젝트 루트의 data/tils/
-DATA_DIR = Path(__file__).parent.parent.parent / "data" / "tils"
+# TIL_REPO_PATH 환경변수로 저장 레포 경로를 주입받는다.
+# 미설정 시 프로젝트 내 data/ 폴더를 fallback으로 사용한다.
+_TIL_REPO = Path(os.environ.get(
+    "TIL_REPO_PATH",
+    str(Path(__file__).parent.parent.parent / "data")
+))
+DATA_DIR = _TIL_REPO / "tils"
 
 
 def _ensure_dir() -> None:

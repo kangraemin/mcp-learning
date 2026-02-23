@@ -22,8 +22,8 @@ from mcp.server.fastmcp import FastMCP
 
 from . import storage as db
 
-# 프로젝트 루트 경로
-PROJECT_ROOT = Path(__file__).parent.parent.parent
+# TIL 저장 레포 경로 (storage와 동일한 env var 기준)
+_TIL_REPO = db._TIL_REPO
 
 
 def register_tools(mcp: FastMCP) -> None:
@@ -223,11 +223,11 @@ def register_tools(mcp: FastMCP) -> None:
 
         if saved_file:
             try:
-                rel_path = str(saved_file.relative_to(PROJECT_ROOT))
+                rel_path = str(saved_file.relative_to(_TIL_REPO))
                 # git add
                 subprocess.run(
                     ["git", "add", rel_path],
-                    cwd=str(PROJECT_ROOT),
+                    cwd=str(_TIL_REPO),
                     check=True,
                     capture_output=True,
                 )
@@ -235,7 +235,7 @@ def register_tools(mcp: FastMCP) -> None:
                 commit_msg = f"docs: {title.strip()} 논의 정리 추가"
                 subprocess.run(
                     ["git", "commit", "-m", commit_msg],
-                    cwd=str(PROJECT_ROOT),
+                    cwd=str(_TIL_REPO),
                     check=True,
                     capture_output=True,
                 )
@@ -243,7 +243,7 @@ def register_tools(mcp: FastMCP) -> None:
                 # git push
                 push = subprocess.run(
                     ["git", "push"],
-                    cwd=str(PROJECT_ROOT),
+                    cwd=str(_TIL_REPO),
                     capture_output=True,
                     text=True,
                 )
