@@ -47,7 +47,9 @@ register_prompts(mcp)
 
 # 서버 엔트리포인트
 # python -m til_server.server 또는 python server.py로 실행
-if __name__ == "__main__":
-    # transport 미지정 시 기본값 stdio 사용
-    # stdio는 Claude Code에서 MCP 서버를 실행할 때 권장되는 전송 방식이다.
+def main():
     mcp.run()
+
+
+if __name__ == "__main__":
+    main()

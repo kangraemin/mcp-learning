@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "til-server"
+version = "0.1.0"
+description = "TIL 지식 관리 MCP 서버"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=1.26.0",
+    "python-frontmatter>=1.1.0",
+]
+
+[project.scripts]
+til-server = "til_server.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/til_server"]
