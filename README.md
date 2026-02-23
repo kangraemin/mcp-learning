@@ -49,15 +49,17 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 ### MCP 서버 등록
 
 ```bash
-claude mcp add --transport stdio til-server \
+claude mcp add -s user --transport stdio til-server \
   -- uvx --from git+https://github.com/kangraemin/mcp-learning til-server
 ```
 
 **Windows (PowerShell)**
 ```powershell
-claude mcp add --transport stdio til-server `
+claude mcp add -s user --transport stdio til-server `
   -- uvx --from git+https://github.com/kangraemin/mcp-learning til-server
 ```
+
+> `-s user` 없이 실행하면 현재 프로젝트에만 등록됩니다. 모든 프로젝트에서 쓰려면 `-s user`를 붙이세요.
 
 Claude Code를 재시작하면 끝.
 
@@ -86,14 +88,14 @@ til-notes/
 ## 다른 레포에 저장하고 싶다면
 
 ```bash
-claude mcp add --transport stdio til-server \
+claude mcp add -s user --transport stdio til-server \
   -e TIL_GITHUB_REPO=username/my-notes \
   -- uvx --from git+https://github.com/kangraemin/mcp-learning til-server
 ```
 
 gh CLI 없이 토큰으로 직접 인증하려면:
 ```bash
-claude mcp add --transport stdio til-server \
+claude mcp add -s user --transport stdio til-server \
   -e TIL_GITHUB_REPO=username/my-notes \
   -e GITHUB_TOKEN=ghp_xxxx \
   -- uvx --from git+https://github.com/kangraemin/mcp-learning til-server
