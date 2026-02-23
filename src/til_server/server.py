@@ -33,7 +33,15 @@ from .prompts import register_prompts
 # FastMCP 서버 인스턴스 생성
 # FastMCP는 Flask/FastAPI와 유사한 데코레이터 기반 API를 제공한다.
 # 내부적으로 함수 시그니처의 타입 힌트를 분석하여 JSON Schema를 자동 생성한다.
-mcp = FastMCP("TIL Server")
+mcp = FastMCP(
+    "TIL Server",
+    instructions=(
+        "학습 내용이나 대화에서 논의한 것을 기록·조회·검색할 때 이 서버의 도구를 사용하세요. "
+        "기록 요청(예: '오늘 배운 거 저장해줘', '이 내용 TIL로 남겨줘')이 오면 "
+        "create_til 도구로 저장하세요. "
+        "목록 조회는 til://list 리소스, 검색은 search_til 도구를 사용하세요."
+    ),
+)
 
 # GitHub 레포지토리 초기화 — 레포/tils/ 디렉토리가 없으면 생성
 _ensure_dir()
