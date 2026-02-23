@@ -18,8 +18,8 @@ MCP(Model Context Protocol) 원리 설명:
 
     이 서버의 구조:
     - server.py: FastMCP 인스턴스 생성 + 엔트리포인트 (이 파일)
-    - storage.py: 파일 기반 마크다운 저장소 로직
-    - tools.py: Tool 정의 (create, update, delete, search, add_tag, export, discussion_recap)
+    - storage.py: GitHub API 기반 마크다운 저장소 로직
+    - tools.py: Tool 정의 (create, update, delete, search, add_tag, export)
     - resources.py: Resource 정의 (list, today, week, detail, tags, categories, stats)
     - prompts.py: Prompt 정의 (write_til, weekly_review, suggest_topics, summarize)
 """
@@ -35,7 +35,7 @@ from .prompts import register_prompts
 # 내부적으로 함수 시그니처의 타입 힌트를 분석하여 JSON Schema를 자동 생성한다.
 mcp = FastMCP("TIL Server")
 
-# 데이터 디렉토리 초기화 — data/tils/ 디렉토리가 없으면 생성
+# GitHub 레포지토리 초기화 — 레포/tils/ 디렉토리가 없으면 생성
 _ensure_dir()
 
 # 각 모듈에서 tool/resource/prompt를 등록

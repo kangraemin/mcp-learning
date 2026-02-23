@@ -39,7 +39,7 @@ def register_resources(mcp: FastMCP) -> None:
 
     @mcp.resource("til://list/week")
     def list_week_tils() -> str:
-        """이번 주(월~일) 작성한 TIL 목록을 조회합니다."""
+        """최근 7일간 작성한 TIL 목록을 조회합니다."""
         tils = db.list_week_tils()
         return json.dumps(tils, ensure_ascii=False, indent=2)
 
