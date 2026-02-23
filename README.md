@@ -140,7 +140,7 @@ TIL MCP 서버 → GitHub API → til-notes 레포에 .md 파일 생성
 |-----|------|
 | `til://list` | 전체 목록 |
 | `til://list/today` | 오늘 기록 |
-| `til://list/week` | 이번 주 기록 |
+| `til://list/week` | 최근 7일 기록 |
 | `til://{id}` | 특정 TIL 상세 |
 | `til://tags` | 태그 목록 |
 | `til://stats` | 학습 통계 |
