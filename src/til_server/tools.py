@@ -15,7 +15,6 @@ MCP 원리 설명:
 """
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
@@ -41,11 +40,14 @@ def register_tools(mcp: FastMCP) -> None:
     ) -> dict:
         """새 TIL(Today I Learned) 항목을 작성합니다.
 
+        학습 내용을 직접 입력하거나, 현재 대화에서 논의한 내용을 요약하여 저장할 때 모두 사용합니다.
+        예) "오늘 Python 배운 거 기록해줘" / "방금 토큰 최적화 논의한 거 정리해줘"
+
         Args:
             title: TIL 제목 (예: "Python 데코레이터 이해하기")
-            content: 학습 내용 (Markdown 지원)
+            content: 학습/논의 내용 (Markdown 지원)
             tags: 태그 목록 (예: ["python", "decorator"])
-            category: 카테고리 (기본값: "general")
+            category: 카테고리 (기본값: "general", 대화 요약 시 "discussion" 권장)
         """
         # 입력 검증 — FastMCP가 타입은 자동 검증하지만, 비즈니스 규칙은 직접 체크
         if not title.strip():
@@ -180,77 +182,3 @@ def register_tools(mcp: FastMCP) -> None:
         markdown = "\n".join(lines)
         return {"status": "exported", "markdown": markdown, "count": len(tils)}
 
-    @mcp.tool()
-    def save_discussion_recap(
-        title: str,
-        content: str,
-        tags: list[str] | None = None,
-        category: str = "discussion",
-    ) -> dict:
-        """현재 대화에서 논의한 내용을 요약하여 마크다운 파일로 저장합니다.
-
-        Claude와 나눈 대화에서 특정 주제에 대해 논의한 내용을 정리할 때 사용하세요.
-        저장 후 git commit + push가 자동으로 실행됩니다.
-
-        Args:
-            title: 논의 주제 제목 (예: "토큰 최적화 방안")
-            content: 논의 내용 요약 (Markdown)
-            tags: 태그 목록
-            category: 카테고리 (기본값: "discussion")
-        """
-        if not title.strip():
-            raise ValueError("제목은 비어있을 수 없습니다")
-        if not content.strip():
-            raise ValueError("내용은 비어있을 수 없습니다")
-
-        # TIL로 저장
-        til = db.create_til(
-            title=title.strip(),
-            content=content.strip(),
-            category=category.strip(),
-            tags=tags,
-        )
-
-        # 저장된 파일을 git에 추가
-        # storage.py의 DATA_DIR 기반으로 파일 경로 계산
-        from . import storage as _storage
-        from datetime import datetime
-
-        data_dir = _storage.DATA_DIR
-        # 방금 저장된 파일 찾기 (id로)
-        saved_file = _storage._find_file_by_id(til["id"])
-        git_result = {"committed": False, "pushed": False, "error": None}
-
-        if saved_file:
-            try:
-                rel_path = str(saved_file.relative_to(_TIL_REPO))
-                # git add
-                subprocess.run(
-                    ["git", "add", rel_path],
-                    cwd=str(_TIL_REPO),
-                    check=True,
-                    capture_output=True,
-                )
-                # git commit
-                commit_msg = f"docs: {title.strip()} 논의 정리 추가"
-                subprocess.run(
-                    ["git", "commit", "-m", commit_msg],
-                    cwd=str(_TIL_REPO),
-                    check=True,
-                    capture_output=True,
-                )
-                git_result["committed"] = True
-                # git push
-                push = subprocess.run(
-                    ["git", "push"],
-                    cwd=str(_TIL_REPO),
-                    capture_output=True,
-                    text=True,
-                )
-                git_result["pushed"] = push.returncode == 0
-                if push.returncode != 0:
-                    git_result["error"] = push.stderr.strip()
-            except subprocess.CalledProcessError as e:
-                git_result["error"] = e.stderr.decode(errors="replace").strip() if e.stderr else str(e)
-
-        return {"status": "saved", "til": til, "git": git_result}

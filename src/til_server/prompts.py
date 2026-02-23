@@ -138,7 +138,7 @@ def register_prompts(mcp: FastMCP) -> None:
         """
         return f"""현재 대화에서 "{topic}" 관련 논의를 요약해주세요.
 
-다음 마크다운 구조로 정리한 뒤, save_discussion_recap 도구를 호출하여 저장해주세요.
+다음 마크다운 구조로 정리한 뒤, create_til 도구를 호출하여 저장해주세요.
 
 ## 논의 배경
 - 이 주제가 왜 논의되었는지, 어떤 문제나 질문에서 시작되었는지 설명
