@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "til-server"
-version = "0.1.0"
+version = "0.1.1"
 description = "TIL 지식 관리 MCP 서버"
 requires-python = ">=3.11"
 dependencies = [
