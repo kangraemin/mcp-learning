@@ -15,14 +15,9 @@ MCP 원리 설명:
 """
 from __future__ import annotations
 
-from pathlib import Path
-
 from mcp.server.fastmcp import FastMCP
 
 from . import storage as db
-
-# TIL 저장 레포 경로 (storage와 동일한 env var 기준)
-_TIL_REPO = db._TIL_REPO
 
 
 def register_tools(mcp: FastMCP) -> None:
