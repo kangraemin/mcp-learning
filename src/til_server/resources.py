@@ -19,7 +19,7 @@ import json
 
 from mcp.server.fastmcp import FastMCP
 
-from . import db
+from . import storage as db
 
 
 def register_resources(mcp: FastMCP) -> None:
@@ -57,14 +57,14 @@ def register_resources(mcp: FastMCP) -> None:
 
     @mcp.resource("til://tags")
     def list_tags() -> str:
-        """전체 태그 목록과 각 태그의 사용 횟수를 조회합니다."""
-        tags = db.list_all_tags()
+        """전체 태그 목록을 조회합니다."""
+        tags = db.get_tags()
         return json.dumps(tags, ensure_ascii=False, indent=2)
 
     @mcp.resource("til://categories")
     def list_categories() -> str:
-        """전체 카테고리 목록과 각 카테고리의 TIL 개수를 조회합니다."""
-        categories = db.list_all_categories()
+        """전체 카테고리 목록을 조회합니다."""
+        categories = db.get_categories()
         return json.dumps(categories, ensure_ascii=False, indent=2)
 
     @mcp.resource("til://stats")

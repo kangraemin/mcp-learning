@@ -18,7 +18,7 @@ import json
 
 from mcp.server.fastmcp import FastMCP
 
-from . import db
+from . import storage as db
 
 
 def register_prompts(mcp: FastMCP) -> None:
@@ -128,3 +128,33 @@ def register_prompts(mcp: FastMCP) -> None:
 3. 카테고리별 학습 분포
 4. 주요 태그 분석
 5. 학습 성취도 평가 및 개선 제안"""
+
+    @mcp.prompt()
+    def discussion_recap(topic: str) -> str:
+        """현재 대화에서 특정 주제에 대한 논의를 요약하여 저장하는 프롬프트.
+
+        Args:
+            topic: 요약할 논의 주제 (예: "토큰 최적화 방안")
+        """
+        return f"""현재 대화에서 "{topic}" 관련 논의를 요약해주세요.
+
+다음 마크다운 구조로 정리한 뒤, save_discussion_recap 도구를 호출하여 저장해주세요.
+
+## 논의 배경
+- 이 주제가 왜 논의되었는지, 어떤 문제나 질문에서 시작되었는지 설명
+
+## 핵심 내용
+- 논의에서 다룬 핵심 사항들을 bullet point로 정리
+- 각 항목은 구체적이고 실행 가능한 내용으로
+
+## 적용 방법 / 결론
+- 논의를 통해 도달한 결론
+- 실제로 어떻게 적용할지 방법 제시
+
+## 참고
+- 관련 자료, 링크, 추가 맥락 (있을 경우)
+
+저장 시 다음을 지정해주세요:
+- title: "{topic}" 또는 더 구체적인 제목
+- category: "discussion"
+- tags: 논의와 관련된 키워드들"""
