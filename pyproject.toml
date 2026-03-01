@@ -12,6 +12,10 @@ dependencies = [
     "python-frontmatter>=1.1.0",
 ]
 
+[project.optional-dependencies]
+notion = ["notion-client>=2.0.0"]
+all = ["notion-client>=2.0.0"]
+
 [project.scripts]
 til-server = "til_server.server:main"
 

@@ -18,6 +18,7 @@ from __future__ import annotations
 from mcp.server.fastmcp import FastMCP
 
 from . import storage as db
+from . import config
 
 
 def register_tools(mcp: FastMCP) -> None:
@@ -176,4 +177,79 @@ def register_tools(mcp: FastMCP) -> None:
 
         markdown = "\n".join(lines)
         return {"status": "exported", "markdown": markdown, "count": len(tils)}
+
+    @mcp.tool()
+    def migrate_backend(
+        target: str,
+        dry_run: bool = True,
+    ) -> dict:
+        """현재 백엔드의 모든 TIL을 다른 백엔드로 마이그레이션합니다.
+
+        GitHub ↔ Notion 간 양방향 마이그레이션을 지원합니다.
+        ID, tags, created_at 등 메타데이터가 보존됩니다.
+
+        Args:
+            target: 마이그레이션 대상 백엔드 ("github" 또는 "notion")
+            dry_run: True면 실제 복사 없이 건수만 확인 (기본값: True)
+        """
+        current = config.get_backend()
+
+        if target not in ("github", "notion"):
+            raise ValueError(f"지원하지 않는 백엔드: '{target}'. 'github' 또는 'notion'을 지정하세요")
+        if target == current:
+            raise ValueError(f"이미 '{current}' 백엔드를 사용 중입니다")
+
+        # 소스 백엔드에서 전체 TIL 조회
+        source_tils = db.list_all_tils()
+
+        if dry_run:
+            preview = [{"id": t["id"], "title": t["title"]} for t in source_tils[:5]]
+            return {
+                "status": "dry_run",
+                "source": current,
+                "target": target,
+                "total": len(source_tils),
+                "preview": preview,
+                "message": f"{len(source_tils)}건의 TIL을 {current} → {target}으로 마이그레이션합니다. "
+                           "dry_run=False로 실행하면 실제 마이그레이션이 진행됩니다.",
+            }
+
+        # 타겟 백엔드 모듈 가져오기
+        import importlib
+        if target == "notion":
+            target_mod = importlib.import_module("til_server.notion_storage")
+        else:
+            target_mod = importlib.import_module("til_server.github_storage")
+
+        migrated = 0
+        failed: list[dict] = []
+
+        for til in source_tils:
+            try:
+                target_mod._create_til_with_metadata(
+                    til_id=til["id"],
+                    title=til["title"],
+                    content=til["content"],
+                    category=til["category"],
+                    tags=til["tags"],
+                    created_at=til["created_at"],
+                    updated_at=til["updated_at"],
+                )
+                migrated += 1
+            except Exception as e:
+                failed.append({"id": til["id"], "title": til["title"], "error": str(e)})
+
+        # 설정 변경
+        cfg = config.load_config()
+        cfg["backend"] = target
+        config.save_config(cfg)
+
+        return {
+            "status": "completed",
+            "source": current,
+            "target": target,
+            "migrated": migrated,
+            "failed": failed,
+            "new_backend": target,
+        }
 

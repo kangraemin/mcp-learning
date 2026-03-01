@@ -18,43 +18,60 @@ MCP(Model Context Protocol) 원리 설명:
 
     이 서버의 구조:
     - server.py: FastMCP 인스턴스 생성 + 엔트리포인트 (이 파일)
-    - storage.py: GitHub API 기반 마크다운 저장소 로직
-    - tools.py: Tool 정의 (create, update, delete, search, add_tag, export)
+    - storage.py: 백엔드 라우터 (config 기반으로 GitHub/Notion 선택)
+    - tools.py: Tool 정의 (create, update, delete, search, add_tag, export, migrate)
     - resources.py: Resource 정의 (list, today, week, detail, tags, categories, stats)
     - prompts.py: Prompt 정의 (write_til, weekly_review, suggest_topics, summarize)
 """
 from mcp.server.fastmcp import FastMCP
 
-from .storage import _ensure_dir
+from .config import is_first_run, get_backend
 from .tools import register_tools
 from .resources import register_resources
 from .prompts import register_prompts
 
-# FastMCP 서버 인스턴스 생성
-# FastMCP는 Flask/FastAPI와 유사한 데코레이터 기반 API를 제공한다.
-# 내부적으로 함수 시그니처의 타입 힌트를 분석하여 JSON Schema를 자동 생성한다.
-mcp = FastMCP(
-    "TIL Server",
-    instructions=(
-        "학습 내용이나 대화에서 논의한 것을 기록·조회·검색할 때 이 서버의 도구를 사용하세요. "
-        "기록 요청(예: '오늘 배운 거 저장해줘', '이 내용 TIL로 남겨줘')이 오면 "
-        "create_til 도구로 저장하세요. "
-        "목록 조회는 til://list 리소스, 검색은 search_til 도구를 사용하세요."
-    ),
+# --- Instructions 구성 ---
+
+_BASE_INSTRUCTIONS = (
+    "학습 내용이나 대화에서 논의한 것을 기록·조회·검색할 때 이 서버의 도구를 사용하세요. "
+    "기록 요청(예: '오늘 배운 거 저장해줘', '이 내용 TIL로 남겨줘')이 오면 "
+    "create_til 도구로 저장하세요. "
+    "목록 조회는 til://list 리소스, 검색은 search_til 도구를 사용하세요."
 )
 
-# GitHub 레포지토리 초기화 — 레포/tils/ 디렉토리가 없으면 생성
-_ensure_dir()
+_SETUP_INSTRUCTIONS = (
+    "아직 백엔드가 설정되지 않았습니다. "
+    "~/.til/config.json을 생성하여 GitHub 또는 Notion 백엔드를 선택해주세요. "
+    "설정 예시: {\"backend\": \"github\", \"github\": {\"repo\": \"username/til-notes\"}} "
+    "또는 {\"backend\": \"notion\", \"notion\": {\"token\": \"secret_...\", \"database_id\": \"...\"}}"
+)
+
+
+def _build_instructions() -> str:
+    if is_first_run():
+        return f"{_SETUP_INSTRUCTIONS}\n\n{_BASE_INSTRUCTIONS}"
+    return _BASE_INSTRUCTIONS
+
+
+# --- FastMCP 서버 인스턴스 생성 ---
+
+mcp = FastMCP(
+    "TIL Server",
+    instructions=_build_instructions(),
+)
+
+# 백엔드 초기화 — 첫 실행이 아닐 때만
+if not is_first_run():
+    from .storage import _ensure_dir
+    _ensure_dir()
 
 # 각 모듈에서 tool/resource/prompt를 등록
-# 관심사 분리(Separation of Concerns) 원칙에 따라 파일을 분리했다.
 register_tools(mcp)
 register_resources(mcp)
 register_prompts(mcp)
 
 
 # 서버 엔트리포인트
-# python -m til_server.server 또는 python server.py로 실행
 def main():
     mcp.run()
 

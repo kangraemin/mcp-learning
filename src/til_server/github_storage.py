@@ -352,6 +352,21 @@ def create_til(title: str, content: str, category: str = "general",
     return _parse_til(text)
 
 
+def _create_til_with_metadata(til_id: int, title: str, content: str,
+                               category: str, tags: list[str],
+                               created_at: str, updated_at: str) -> dict:
+    """마이그레이션용: 메타데이터를 보존하여 TIL을 생성한다."""
+    _ensure_dir()
+    date_str = created_at[:10]
+    slug = _make_slug(title)
+    path = _make_path(date_str, slug)
+
+    text = _til_to_text(til_id, title, content, category, tags, created_at, updated_at)
+    _put_file(path, text, f"feat: TIL 마이그레이션 - {title}")
+
+    return _parse_til(text)
+
+
 def update_til(til_id: int, title: str | None = None,
                content: str | None = None, category: str | None = None,
                tags: list[str] | None = None) -> dict:
