@@ -103,6 +103,53 @@ claude mcp add -s user --transport stdio til-server \
 
 ---
 
+## Notion에 저장하고 싶다면
+
+### 1. Notion Integration 토큰 발급
+
+1. [Notion Integrations](https://www.notion.so/my-integrations) 접속
+2. **"New integration"** 클릭 → 이름 입력 → 생성
+3. **"Internal Integration Token"** 복사 (`secret_xxxx` 형태)
+
+### 2. Notion 데이터베이스 준비
+
+Notion에서 데이터베이스를 직접 만들고, Integration에 **공유** 권한을 부여한다.
+
+데이터베이스에 다음 속성이 필요하다:
+| 속성명 | 타입 |
+|--------|------|
+| Name | title |
+| ID | number |
+| Category | select |
+| Tags | multi_select |
+| Created At | date |
+| Updated At | date |
+
+데이터베이스 URL에서 ID 복사: `notion.so/workspace/`**`xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`**`?v=...`
+
+### 3. MCP 서버 등록
+
+```bash
+claude mcp add -s user --transport stdio til-server \
+  -e TIL_BACKEND=notion \
+  -e NOTION_TOKEN=secret_xxxx \
+  -e NOTION_DATABASE_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+  -- uvx til-server
+```
+
+**Windows (PowerShell)**
+```powershell
+claude mcp add -s user --transport stdio til-server `
+  -e TIL_BACKEND=notion `
+  -e NOTION_TOKEN=secret_xxxx `
+  -e NOTION_DATABASE_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx `
+  -- uvx til-server
+```
+
+> 토큰은 Claude Desktop config(`~/.claude/claude_desktop_config.json`)의 `env` 항목에만 저장되며, 코드나 레포에는 포함되지 않는다.
+
+---
+
 ## 동작 원리
 
 ```

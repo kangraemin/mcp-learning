@@ -41,9 +41,9 @@ _BASE_INSTRUCTIONS = (
 
 _SETUP_INSTRUCTIONS = (
     "아직 백엔드가 설정되지 않았습니다. "
-    "~/.til/config.json을 생성하여 GitHub 또는 Notion 백엔드를 선택해주세요. "
-    "설정 예시: {\"backend\": \"github\", \"github\": {\"repo\": \"username/til-notes\"}} "
-    "또는 {\"backend\": \"notion\", \"notion\": {\"token\": \"secret_...\", \"database_id\": \"...\"}}"
+    "MCP 등록 시 환경변수로 백엔드를 지정하세요. "
+    "GitHub: -e TIL_BACKEND=github "
+    "Notion: -e TIL_BACKEND=notion -e NOTION_TOKEN=secret_... -e NOTION_DATABASE_ID=..."
 )
 
 

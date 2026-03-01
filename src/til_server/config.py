@@ -62,7 +62,18 @@ def save_config(config: dict) -> None:
 # --- 설정 조회 ---
 
 def get_backend() -> str:
-    """현재 선택된 백엔드 이름을 반환한다. "github" 또는 "notion"."""
+    """현재 선택된 백엔드 이름을 반환한다. "github" 또는 "notion".
+
+    우선순위: TIL_BACKEND 환경변수 > config.json > 기본값(github)
+    """
+    env_backend = os.environ.get("TIL_BACKEND", "").strip().lower()
+    if env_backend:
+        if env_backend not in _VALID_BACKENDS:
+            raise ConfigError(
+                f"잘못된 TIL_BACKEND: '{env_backend}'. "
+                f"지원 백엔드: {', '.join(_VALID_BACKENDS)}"
+            )
+        return env_backend
     config = load_config()
     backend = config.get("backend", "github")
     if backend not in _VALID_BACKENDS:
@@ -81,5 +92,10 @@ def get_backend_config() -> dict:
 
 
 def is_first_run() -> bool:
-    """설정 파일이 존재하지 않으면 True."""
+    """백엔드가 설정되지 않은 상태면 True.
+
+    TIL_BACKEND 환경변수가 있거나 config.json이 존재하면 False.
+    """
+    if os.environ.get("TIL_BACKEND", "").strip():
+        return False
     return not _config_path().exists()
