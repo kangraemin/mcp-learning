@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "mcp-builder": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "fc68038c900eb801f73ff96130c9f9dba533cc94212ed8435833242f196dedcf"
+    },
+    "python-testing-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "a2cc64d28bbda77aeac8ec634ae38102a3b8d2314f3aa802811a44281c5d7838"
+    },
+    "test-driven-development": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "computedHash": "126f1ebf6ccd414f42544f6e83d8cc5adb089e1108eaffb7c400701e37eecd9f"
+    }
+  }
+}
